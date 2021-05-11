@@ -9,9 +9,11 @@ import java.util.ResourceBundle;
 import org.jgrapht.graph.SimpleGraph;
 
 import it.polito.tdp.borders.model.Border;
+import it.polito.tdp.borders.model.Country;
 import it.polito.tdp.borders.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -30,6 +32,9 @@ public class FXMLController {
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
+    
+    @FXML
+    private ComboBox<Country> countrybox;
 
     @FXML
     void doCalcolaConfini(ActionEvent event) {
@@ -47,7 +52,7 @@ public class FXMLController {
     		this.txtResult.appendText("Error - exception in converting Integer");
     	}
     	if(x>2006 || x<1860) {
-    		this.txtResult.appendText("Anno non valido");
+    		this.txtResult.setText("Anno non valido");
     		this.txtAnno.clear();
     		return;
     	}
@@ -68,14 +73,34 @@ public class FXMLController {
     	
     }
 
+    
+    @FXML
+    void doRaggiungibili(ActionEvent event) {
+    	this.txtResult.clear();
+    	this.model.creaGrafo(2006);
+    	Country c = this.countrybox.getValue();
+    	List<Country> lc = model.trovaAdiacentiProfundita(c);
+    	if(lc.isEmpty()) {
+    		this.txtResult.appendText("Paese isolato!");
+    	} else 
+    	for(Country p : lc) {
+    		this.txtResult.appendText(p.toString()+"\n");
+    	}
+    	
+    }
+    
+    
+    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert txtAnno != null : "fx:id=\"txtAnno\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
-
+        
     }
     
     public void setModel(Model model) {
     	this.model = model;
+    	countrybox.getItems().addAll(model.getAllCountries());
+    	
     }
 }

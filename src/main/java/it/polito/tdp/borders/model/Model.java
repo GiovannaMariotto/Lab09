@@ -6,8 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
+import org.jgrapht.event.ConnectedComponentTraversalEvent;
+import org.jgrapht.event.EdgeTraversalEvent;
+import org.jgrapht.event.TraversalListener;
+import org.jgrapht.event.VertexTraversalEvent;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.traverse.DepthFirstIterator;
 
 import it.polito.tdp.borders.db.BordersDAO;
 
@@ -64,9 +71,12 @@ public class Model {
 				}
 			}
 		}
+		ConnectivityInspector ci = new ConnectivityInspector(grafo);
 		System.out.println("Grafo creato!");
 		System.out.println("#Vertici: "+grafo.vertexSet().size()+"\n");
 		System.out.println("#Archi: "+grafo.edgeSet().size()+"\n");
+		//System.out.println("Is connected? "+ci.isConnected());
+	
 		
 	}
 	
@@ -78,9 +88,137 @@ public class Model {
 	public String infoGrafo(SimpleGraph grafo) {
 		String s ="";
 		s+="#Vertici: "+grafo.vertexSet().size()+", #Archi: "+grafo.edgeSet().size()+"\n";
+		
 		return s;
 	}
 	
+	//ESERCIZIO 2
+
+	public List<Country> trovaAdiacenti(final Country c){
+		final List<Country> lStati = new ArrayList();
+		final SimpleGraph grafo = getGrafo();
+		BreadthFirstIterator<Country,DefaultEdge> bfv = new BreadthFirstIterator<Country,DefaultEdge>(this.getGrafo(),c);
+		final Map<Country,Country> mapaC = new HashMap<>();
+		
+		mapaC.put(c, null);//ho messo la radice
+		 int count =0;
+		bfv.addTraversalListener(new TraversalListener<Country,DefaultEdge>(){
+
+			@Override
+			public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {
+				
+			}
+
+			@Override
+			public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {
+				
+			}
+
+			@Override
+			public void edgeTraversed(EdgeTraversalEvent<DefaultEdge> e) {
+				Country c1 = (Country) grafo.getEdgeSource(e.getEdge());
+				Country c2 = (Country) grafo.getEdgeTarget(e.getEdge());
+				if(mapaC.containsKey(c1) && !mapaC.containsKey(c2) && !lStati.contains(c2)) {
+					mapaC.put(c2,c1 );
+					lStati.add(c2);
+				}else if(!mapaC.containsKey(c1)&& mapaC.containsKey(c2) && !lStati.contains(c1)) {
+					mapaC.put(c1,c2 );
+					lStati.add(c1);
+				}
+				
+				
+			}
+
+			@Override
+			public void vertexTraversed(VertexTraversalEvent<Country> e) {
+			
+				
+			}
+
+			@Override
+			public void vertexFinished(VertexTraversalEvent<Country> e) {
+				// TODO Auto-generated method stub
+				
+			}});
+		
+		while(bfv.hasNext()) {
+			Country paese=bfv.next();
+			if(!paese.equals(c) && !lStati.contains(paese)) {
+				lStati.add(paese);
+			}
+			
+		}
+	
+	
+		
+		return lStati;
+		
+	}
+	
+	public List<Country> trovaAdiacentiProfundita(final Country c){
+		//Visita di profundita
+		DepthFirstIterator<Country,DefaultEdge> dfv = new DepthFirstIterator<Country,DefaultEdge>(this.getGrafo(),c);
+		final List<Country> nStati = new ArrayList();
+		final SimpleGraph grafo = this.getGrafo();
+		 final Map<Country,Country> mapa = new HashMap<>();
+		mapa.put(c, null);//messo la radice
+		
+		dfv.addTraversalListener(new TraversalListener() {
+
+			@Override
+			public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void edgeTraversed(EdgeTraversalEvent e) {
+				Country c1 = (Country) grafo.getEdgeSource(e.getEdge());
+				Country c2 = (Country) grafo.getEdgeTarget(e.getEdge());
+				if(mapa.containsKey(c1) && !mapa.containsKey(c2) && !nStati.contains(c2)) {
+					mapa.put(c2,c1);
+					nStati.add(c2);
+				} else if(!mapa.containsKey(c1) && mapa.containsKey(c2) && !nStati.contains(c1)) {
+					mapa.put(c1, c2);
+					nStati.add(c1);
+				}
+				
+				
+			}
+
+			@Override
+			public void vertexTraversed(VertexTraversalEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void vertexFinished(VertexTraversalEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		if(dfv.hasNext()) {
+			Country paese =dfv.next();
+			SimpleGraph g = this.getGrafo();
+			int i = g.degreeOf(paese);
+			System.out.println(paese.toString()+" ,"+i+"\n");
+			if(!nStati.contains(paese) && !paese.equals(c) ) {
+				nStati.add(paese);
+			}
+		}
+		
+		
+		return nStati;
+	}
 	
 	
 }

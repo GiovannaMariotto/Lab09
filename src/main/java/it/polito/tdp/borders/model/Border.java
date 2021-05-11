@@ -24,7 +24,7 @@ public class Border {
 
 	@Override
 	public String toString() {
-		return "Border : " + c1.getStateName() + " , " + c2.getStateName() + ", anno=" + anno ;
+		return  c1.getStateName() + " , " + c2.getStateName() + ", anno=" + anno ;
 	}
 
 

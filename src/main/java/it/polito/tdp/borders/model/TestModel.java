@@ -2,6 +2,7 @@ package it.polito.tdp.borders.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TestModel {
 
@@ -9,8 +10,9 @@ public class TestModel {
 
 		Model model = new Model();
 		model.creaGrafo(2000);
-		
-		
+		Map<Integer,Country> m = model.getIdCountryMap();
+		List<Country> c = model.trovaAdiacenti(m.get(53));
+		System.out.println(c.toString());
 		
 		
 	//	System.out.println("TestModel -- TODO");
