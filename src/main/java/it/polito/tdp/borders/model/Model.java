@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
@@ -51,6 +52,13 @@ public class Model {
 		return dao.getCountryPairs(x, idMap);
 	}
 	
+	public Set getDegree(Country c) {
+		ConnectivityInspector ci = new ConnectivityInspector(grafo);
+		Set<Country> set = ci.connectedSetOf(c);
+		System.out.println(set.size());
+		return set;
+	}
+	
 	public void creaGrafo(int x) {
 		
 		 grafo = new SimpleGraph<Country,DefaultEdge>(DefaultEdge.class);
@@ -93,6 +101,69 @@ public class Model {
 	}
 	
 	//ESERCIZIO 2
+	
+	public List<Country> getRaggiungibili(Country c){
+		final List<Country> visitati = new ArrayList<>();
+		final List<Country> daVisitare = new ArrayList<Country>();
+		  grafo = getGrafo();
+		BreadthFirstIterator<Country,DefaultEdge> bfv = new BreadthFirstIterator<Country,DefaultEdge>(grafo,c);
+		visitati.add(c);
+		while(!daVisitare.isEmpty()) {
+			bfv.addTraversalListener(new TraversalListener() {
+
+				@Override
+				public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void edgeTraversed(EdgeTraversalEvent e) {
+					Country c1 = grafo.getEdgeSource((DefaultEdge) e.getEdge());
+					Country c2 = grafo.getEdgeTarget((DefaultEdge) e.getEdge());
+					if(!visitati.contains(c2) && visitati.contains(c1) && !daVisitare.contains(c2)) {
+						daVisitare.add(c2);
+					} else if(visitati.contains(c2) && !visitati.contains(c1) && !daVisitare.contains(c1)) {
+						daVisitare.add(c1);
+					}
+					
+					
+				}
+
+				@Override
+				public void vertexTraversed(VertexTraversalEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void vertexFinished(VertexTraversalEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			
+		
+		}
+				while(bfv.hasNext()) {
+			Country paese = bfv.next();
+			if(!visitati.contains(paese)) {
+				visitati.add(paese);
+				daVisitare.remove(paese);
+			}
+		}
+		System.out.println(visitati.size());
+		
+		return visitati;
+	
+	}
 
 	public List<Country> trovaAdiacenti(final Country c){
 		final List<Country> lStati = new ArrayList();

@@ -79,9 +79,9 @@ public class FXMLController {
     	this.txtResult.clear();
     	this.model.creaGrafo(2006);
     	Country c = this.countrybox.getValue();
-    	List<Country> lc = model.trovaAdiacentiProfundita(c);
-    	if(lc.isEmpty()) {
-    		this.txtResult.appendText("Paese isolato!");
+    	List<Country> lc = model.getRaggiungibili(c);
+    	if(lc.isEmpty() || lc.size()==1) {
+    		this.txtResult.appendText("Paese isolato! Senza confini per terra!");
     	} else 
     	for(Country p : lc) {
     		this.txtResult.appendText(p.toString()+"\n");

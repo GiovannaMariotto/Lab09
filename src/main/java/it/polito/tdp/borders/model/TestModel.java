@@ -3,6 +3,7 @@ package it.polito.tdp.borders.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TestModel {
 
@@ -11,7 +12,8 @@ public class TestModel {
 		Model model = new Model();
 		model.creaGrafo(2000);
 		Map<Integer,Country> m = model.getIdCountryMap();
-		List<Country> c = model.trovaAdiacenti(m.get(53));
+		List<Country> c = model.getRaggiungibili(m.get(290));
+		//Set<Country> set = model.getDegree(m.get(290));
 		System.out.println(c.toString());
 		
 		
